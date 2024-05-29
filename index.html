@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=10., maximum-scale=1.0, user-scalable=no">
+    <title>NHC</title>
+    <!--jquery-->
+    <script src="js/lib/jquery-2.1.4.js"></script>
+    <!--jquery mobile-->
+    <script src="js/lib/jquery.mobile-1.4.5.js"></script>
+    <!--jquery validate-->
+    <script src="js/lib/jquery.validate.js"></script>
+    <!--jquery mobile styles-->
+    <link rel="stylesheet" href="css/lib/jquery.mobile-1.4.5.css">
+    <link rel="stylesheet" href="css/PKmystyle.css"><!--our stuff-->
+    <script src="js/PKDatabase.js"></script>
+    <script src="js/PKDAL.js"></script>
+    <script src="js/PKutil.js"></script>
+    <script src="js/PKfacade.js"></script>
+    <script src="js/PKglobal.js"></script>
+</head>
+
+
+<!--home page-->
+<div data-role="page" id="pageHome">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect Home</h1>
+    </header>
+    <br>
+
+    <section data-role="content">
+        <h1 style="text-align:center">Welcome to NeighbourHood Connect!</h1>
+        <br>
+        <br>
+        <p style="text-align:center">Welcome to your neighbourhood's app!
+            This app will be used to keep in touch with your neighbours!</p>
+        <br>
+
+        <div style="text-align : center;">
+            <img src="/img/house.png" alt="appImage" class ="center" width ="225" height="175">
+        </div>
+        <br>
+        <br>
+        <p style="text-align:center">You can use any of the tabs
+        at the bottom to post a post, and view posts.
+        Just simply tap on the tab you'd like to go into, and
+        from there you can choose post and make your own!</p>
+        <br>
+    </section>
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+        <h1>&copy;2022 NHC/PK</h1>
+        <div data-role="footer" class="nav-glyphish-example" data-theme="b">
+            <div data-role="navbar" class="nav-glyphish-example" data-grid="d">
+            <ul>
+            <li><a href="#pageNews" data-icon="comment">News</a></li>
+            <li><a href="#pageEvents" data-icon="calendar">Events</a></li>
+                <li><a href="#pageHome" data-icon="home"
+                       class="ui-btn-active ui-state-persist">Home</a></li>
+            <li><a href="#pageReviews" data-icon="info">Reviews</a></li>
+            <li><a href="#pageDevInfo" data-icon="user">Info</a></li>
+            </ul>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- News Page -->
+<div data-role="page" id="pageNews">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect News</h1>
+    </header>
+    <div style="text-align : center;">
+
+    </div>
+    <section>
+
+        <div align="center">
+            <H1>Welcome To The News Feed!</H1>
+        </div>
+    </section>
+    <button id="postNews" style="display: block;">Create A Post</button>
+    <script>
+        $("#postNews").click(function() {
+            window.location.href = "index.html#pagePostNews";
+        });
+    </script>
+    <button id="refreshNews" class="btn">Refresh News</button>
+
+
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+
+        <h1>&copy;2022 NHC/PK</h1>
+        <div data-role="footer" class="nav-glyphish-example" data-theme="b">
+            <div data-role="navbar" class="nav-glyphish-example" data-grid="d">
+                <ul>
+                    <li><a href="#pageNews" data-icon="comment"
+                           class="ui-btn-active ui-state-persist">News</a></li>
+                    <li><a href="#pageEvents" data-icon="calendar">Events</a></li>
+                    <li><a href="#pageHome" data-icon="home">Home</a></li>
+                    <li><a href="#pageReviews" data-icon="info">Reviews</a></li>
+                    <li><a href="#pageDevInfo" data-icon="user">Info</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Post News Page -->
+<div data-role="page" id="pagePostNews">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect News</h1>
+    </header>
+    <div style="text-align : center;">
+
+    </div>
+    <section>
+
+        <div>
+            <H1>Create a news post:</H1>
+        </div>
+
+        <div>
+            <form id="postNewsForm" name="postNewsForm">
+                <label for="postNewsUsername">Name:</label>
+                <input type="text" id="postNewsUsername" name="postNewsUsername" data-clear-btn="true">
+
+                <label for="postNewsTitle">Title:</label>
+                <input type="text" id="postNewsTitle" name="postNewsTitle" data-clear-btn="true">
+
+                <label for="postCategory">Choose the category of your news:</label>
+                <select name="postCategory" id="postCategory">
+                    <option value="Politics">Politics</option>
+                    <option value="Crime">Crime</option>
+                    <option value="Business">Business</option>
+                    <option value="Sports">Sports</option>
+                </select>
+
+                <label for="postNewsLink">Link to news (if applicable):</label>
+                <input type="text" name="postNewsLink" id="postNewsLink">
+
+                <label for="postNewsComments">Your Comments:</label>
+                <textarea name="postNewsComments" id="postNewsComments"></textarea>
+                <script>
+                    // Wait for the form to be submitted
+                    $('postNewsForm').on('submit', function(e) {
+                        e.preventDefault();
+
+                        // Get the data from the form
+                        var newsName = $('#postNewsUsername').val();
+                        var newsTitle = $('#postNewsTitle').val();
+                        var newsCategory = $('#postCategory').val();
+                        var newsLink = $('#postNewsLink').val();
+                        var newsComment = $('#postNewsComments').val();
+
+                        // Save the data to the websql database
+                        db.transaction(function(tx) {
+                            tx.executeSql('INSERT INTO news (newsUsername, newsTitle, newsCategory, newsLink, newsComment) VALUES (?, ?)', [newsName, newsTitle, newsCategory, newsLink, newsComment]);
+                        });
+                    });
+                </script>
+                <button type="submit" onclick="validatePostNewsForm()" id="newsPostButton" style="background-color: dodgerblue;color: white">Post</button>
+            </form>
+        </div>
+    </section>
+    <button id="newsCancel" type="button" style="background-color: darkred;color: white">Cancel</button>
+    <script>
+        $("#newsCancel").click(function() {
+            window.location.href = "index.html#pageNews", $('input[type="text"]').val('');
+        });
+    </script>
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+        <h1>&copy;2022 NHC/PK</h1>
+    </footer>
+</div>
+
+<!-- Events Page -->
+<div data-role="page" id="pageEvents">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect Events</h1>
+    </header>
+    <div style="text-align : center;">
+    </div>
+    <section>
+        <div align="center">
+            <H2>Welcome To The Events Feed!</h2>
+        </div>
+    </section>
+    <button id="postEvents" style="display: block;">Create A Post</button>
+    <script>
+        $("#postEvents").click(function() {
+            window.location.href = "index.html#pagePostEvents";
+        });
+    </script>
+    <button id="refreshEvents" class="btn">Refresh Events</button>
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+        <h1>&copy;2022 NHC/PK</h1>
+        <div data-role="footer" class="nav-glyphish-example" data-theme="b">
+            <div data-role="navbar" class="nav-glyphish-example" data-grid="d">
+                <ul>
+                    <li><a href="#pageNews" data-icon="comment">News</a></li>
+                    <li><a href="#pageEvents" data-icon="calendar"
+                           class="ui-btn-active ui-state-persist">Events</a></li>
+                    <li><a href="#pageHome" data-icon="home">Home</a></li>
+                    <li><a href="#pageReviews" data-icon="info">Reviews</a></li>
+                    <li><a href="#pageDevInfo" data-icon="user">Info</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Post Events page -->
+<div data-role="page" id="pagePostEvents">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect News</h1>
+    </header>
+    <div style="text-align : center;">
+
+    </div>
+    <section>
+
+        <div>
+            <H1>Create an events post:</H1>
+        </div>
+
+        <div>
+            <form id="postEventsForm" name="postEventsForm">
+                <fieldset>
+                    <label for="postEventsUsername">Your Name:</label>
+                    <input type="text" id="postEventsUsername" name="postEventsUsername" data-clear-btn="true">
+
+                    <label for="postEventsTitle">What is the event?:</label>
+                    <input type="text" id="postEventsTitle" name="postEventsTitle" data-clear-btn="true">
+
+                    <label for="postEventsDate">Choose The date of your event:</label>
+                    <input type="datetime-local" id="postEventsDate">
+
+                    <label for="postEventsMandatory">Mandatory Information (if applicable):</label>
+                    <input type="text" name="postEventsMandatory" id="postEventsMandatory">
+
+                    <label for="postEventsInfo">Extra Info About The Event:</label>
+                    <textarea name="postEventsInfo" id="postEventsInfo"></textarea>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+    <button onclick="validatePostEventsForm()" id="postEventButton" style="background-color: dodgerblue;color: white">Post</button>
+    </script>
+    <button id="postEventsCancel" type="button" style="background-color: darkred;color: white">Cancel</button>
+    <script>
+        $("#postEventsCancel").click(function() {
+            window.location.href = "index.html#pageEvents", $('input[type="text"]').val('');
+        });
+    </script>
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+        <h1>&copy;2022 NHC/PK</h1>
+    </footer>
+</div>
+
+<!-- Reviews Page -->
+<div data-role="page" id="pageReviews">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect Reviews</h1>
+    </header>
+    <div style="text-align : center;">
+
+    </div>
+    <section>
+        <div align="center">
+            <H2>Welcome To The Events Feed!</h2>
+        </div>
+    </section>
+    <button id="postReviews" style="display: block;">Create A Post</button>
+    <script>
+        $("#postReviews").click(function() {
+            window.location.href = "index.html#pagePostReviews";
+        });
+    </script>
+    <button id="refreshReviews" class="btn">Refresh Reviews</button>
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+        <h1>&copy;2022 NHC/PK</h1>
+        <div data-role="footer" class="nav-glyphish-example" data-theme="b">
+            <div data-role="navbar" class="nav-glyphish-example" data-grid="d">
+                <ul>
+                    <li><a href="#pageNews" data-icon="comment">News</a></li>
+                    <li><a href="#pageEvents" data-icon="calendar">Events</a></li>
+                    <li><a href="#pageHome" data-icon="home">Home</a></li>
+                    <li><a href="#pageReviews" data-icon="info"
+                           class="ui-btn-active ui-state-persist">Reviews</a></li>
+                    <li><a href="#pageDevInfo" data-icon="user">Info</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Post Reviews Page -->
+<div data-role="page" id="pagePostReviews">
+    <header data-role="header" data-position="fixed" data-theme="a">
+        <h1>NHConnect News</h1>
+    </header>
+    <div style="text-align : center;">
+
+    </div>
+    <section>
+
+        <div>
+            <H1>Create a review post:</H1>
+        </div>
+
+        <div>
+            <form id="postReviewForm" name="postReviewForm">
+                <label for="postReviewUsername">Your Name:</label>
+                <input type="text" id="postReviewUsername" name="postReviewUsername" data-clear-btn="true">
+
+                <label for="postReviewTitle">Title Of Review</label>
+                <input type="text" id="postReviewTitle" name="postReviewTitle" data-clear-btn="true">
+
+                <label for="postReviewComments">Review Comments:</label>
+                <textarea name="textarea-1" id="postReviewComments"></textarea>
+                <div id="ratings">
+                    <label for="rateQuality">Quality (0-5):</label>
+                    <input type="number" name="rateUI" id="rateQuality" value="0">
+                    <label for="rateTaste">Taste (0-5):</label>
+                    <input type="number" name="rateLoading" id="rateTaste" value="0">
+                    <label for="output">Overall Ratings (0-100):</label>
+                    <input type="text" value="0" id="output">
+                </div>
+                <button onclick="validatePostReviewForm()" type="submit" id="postReviewButton" style="background-color: dodgerblue;color: white">Post</button>
+
+            </form>
+        </div>
+    </section>
+    </script>
+    <button onclick="doMath()">Calculate</button>
+    <button id="postReviewCancel" type="button" style="background-color: darkred;color: white">Cancel</button>
+    <script>
+        $("#postReviewCancel").click(function() {
+            window.location.href = "index.html#pageReviews", $('input[type="text"]').val('');
+        });
+    </script>
+    <footer data-role="footer" data-position="fixed" data-theme="a">
+        <h1>&copy;2022 NHC/PK</h1>
+    </footer>
+</div>
+
+</html>
+
